@@ -40,13 +40,9 @@ echo -n "Enter SubDirectory to Create :"
 
 read SubD
 
-echo -n "Enter Github Username :"
+echo -n "Enter Github access token :"
 
-read Username
-
-echo -n "Enter Github Password :"
-
-read -s Password1
+read -s token
 
 echo " "
 echo " "
@@ -54,7 +50,6 @@ echo " "
 # Output Configuration to confirm input
 echo "Organization is : " $GitHubOrg
 echo "SubDirectory is : " $SubD
-echo "Username is : " $Username
 
 echo " "
 echo "Press Enter to Continue.... [Control-C] to Terminate Script"
@@ -66,19 +61,19 @@ read GoDoIt
 # Create Subdirectory if it doesn't exist, user just ignore error if it exists
 mkdir $SubD
 
-curl --user "$Username:$Password1" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=1" | grep -e 'git_url*' | cut -d \" -f 4 
-curl --user "$Username:$Password1" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=2" | grep -e 'git_url*' | cut -d \" -f 4 
-curl --user "$Username:$Password1" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=3" | grep -e 'git_url*' | cut -d \" -f 4 
+curl -H "Authorization: token $token" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=1" | grep -e 'git_url*' | cut -d \" -f 4 
+curl -H "Authorization: token $token" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=2" | grep -e 'git_url*' | cut -d \" -f 4 
+curl -H "Authorization: token $token" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=3" | grep -e 'git_url*' | cut -d \" -f 4 
 # Connect to GitHub API and Extact up to 400 Repos
 # Connect to GitHub API and Extact up to 400 Repos
-curl --user "$Username:$Password1" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=1" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "/usr/bin/git clone ssh://git@github.com/" org "/"  $1 ".git"}' >  $SubD/cloneRepo.sh
-curl --user "$Username:$Password1" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=2" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "/usr/bin/git clone ssh://git@github.com/" org "/"  $1 ".git"}' >>  $SubD/cloneRepo.sh
-curl --user "$Username:$Password1" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=3" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "/usr/bin/git clone ssh://git@github.com/" org "/"  $1 ".git"}' >>  $SubD/cloneRepo.sh
+curl -H "Authorization: token $token" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=1" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "/usr/bin/git clone ssh://git@github.com/" org "/"  $1 ".git"}' >  $SubD/cloneRepo.sh
+curl -H "Authorization: token $token" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=2" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "/usr/bin/git clone ssh://git@github.com/" org "/"  $1 ".git"}' >>  $SubD/cloneRepo.sh
+curl -H "Authorization: token $token" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=3" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "/usr/bin/git clone ssh://git@github.com/" org "/"  $1 ".git"}' >>  $SubD/cloneRepo.sh
 
 
-curl --user "$Username:$Password1" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=1" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "cd ~/" subdir "/" $1 "\n/usr/bin/git pull ssh://git@github.com/" org "/"  $1 ".git\ncd ~"}' >  $SubD/pullRepo.sh
-curl --user "$Username:$Password1" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=2" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "cd ~/" subdir "/" $1 "\n/usr/bin/git pull ssh://git@github.com/" org "/"  $1 ".git\ncd ~"}' >>  $SubD/pullRepo.sh
-curl --user "$Username:$Password1" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=3" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "cd ~/" subdir "/" $1 "\n/usr/bin/git pull ssh://git@github.com/" org "/"  $1 ".git\ncd ~"}' >>  $SubD/pullRepo.sh
+curl -H "Authorization: token $token" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=1" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "cd ~/" subdir "/" $1 "\n/usr/bin/git pull ssh://git@github.com/" org "/"  $1 ".git\ncd ~"}' >  $SubD/pullRepo.sh
+curl -H "Authorization: token $token" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=2" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "cd ~/" subdir "/" $1 "\n/usr/bin/git pull ssh://git@github.com/" org "/"  $1 ".git\ncd ~"}' >>  $SubD/pullRepo.sh
+curl -H "Authorization: token $token" -s "https://api.github.com/orgs/$GitHubOrg/repos?per_page=100&page=3" | grep -e 'git_url*' | cut -d \" -f 4 | cut -d / -f 5 | cut -d . -f 1 | awk -v subdir=$SubD -v org=$GitHubOrg -v user=$Username '{print "cd ~/" subdir "/" $1 "\n/usr/bin/git pull ssh://git@github.com/" org "/"  $1 ".git\ncd ~"}' >>  $SubD/pullRepo.sh
 
 chmod 700 $SubD/cloneRepo.sh
 chmod 700 $SubD/pullRepo.sh
